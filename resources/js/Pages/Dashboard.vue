@@ -1,9 +1,37 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head } from '@inertiajs/vue3';
+import DangerButton from "@/Components/DangerButton.vue";
+import { Head, Link, useForm } from '@inertiajs/vue3';
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+
+const users = ref([]);
+const form = useForm({});
+
+const deleteUser = async (id) => {
+    if (confirm("Are you sure you want to move this to trash " + id)) {
+        try {
+            await axios.delete(`/api/users/${id}`);
+            users.value = users.value.filter((user) => user.id !== id);
+        } catch (error) {
+            console.error("Failed to delete user:", error);
+        }
+    }
+};
+
+onMounted(async () => {
+    try {
+        const response = await axios.get('/api/users');
+        users.value = response.data.data;
+    } catch (error) {
+        console.error('Failed to fetch users:', error);
+    }
+});
 </script>
 
+
 <template>
+
     <Head title="Dashboard" />
 
     <AuthenticatedLayout>
@@ -14,7 +42,33 @@ import { Head } from '@inertiajs/vue3';
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-gray-900">You're logged in!</div>
+                    <div class="p-6 text-gray-900">
+                        <table class="table-auto text-center w-full border border-gray-300">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="border text-center px-4 py-2 text-left">No</th>
+                                    <th class="border text-center px-4 py-2 text-left">Name</th>
+                                    <th class="border text-center px-4 py-2 text-left">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(user, index) in users" :key="user.id" class="hover:bg-gray-50">
+                                    <td class="border px-4 py-2">{{ index + 1 }}</td>
+                                    <td class="border px-4 py-2">{{ user.name }}</td>
+                                    <td class="border px-4 py-2">
+                                        <DangerButton class="ml-2 py-3 rounded my-auto text-white bg-red-500" @click="
+                                            deleteUser(
+                                                user.id
+                                            )
+                                            ">
+                                            Delete
+                                        </DangerButton>
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
