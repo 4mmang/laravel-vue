@@ -14,6 +14,7 @@ const { data } = usePage().props
         NIM: {{ item.nim }} |
         Angkatan: {{ item.angkatan }}
       </li>
+      Testing
     </ul>
   </div>
 </template>
