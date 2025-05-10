@@ -1,9 +1,10 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import DangerButton from "@/Components/DangerButton.vue";
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, useForm } from '@inertiajs/vue3';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import EditButton from '@/Components/EditButton.vue';
 
 const users = ref([]);
 const form = useForm({});
@@ -22,6 +23,7 @@ const deleteUser = async (id) => {
 onMounted(async () => {
     try {
         const response = await axios.get('/api/users');
+
         users.value = response.data.data;
     } catch (error) {
         console.error('Failed to fetch users:', error);
@@ -46,9 +48,9 @@ onMounted(async () => {
                         <table class="table-auto text-center w-full border border-gray-300">
                             <thead class="bg-gray-100">
                                 <tr>
-                                    <th class="border text-center px-4 py-2 text-left">No</th>
-                                    <th class="border text-center px-4 py-2 text-left">Name</th>
-                                    <th class="border text-center px-4 py-2 text-left">Action</th>
+                                    <th class="border text-center px-4 py-2">No</th>
+                                    <th class="border text-center px-4 py-2">Name</th>
+                                    <th class="border text-center px-4 py-2">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -56,6 +58,8 @@ onMounted(async () => {
                                     <td class="border px-4 py-2">{{ index + 1 }}</td>
                                     <td class="border px-4 py-2">{{ user.name }}</td>
                                     <td class="border px-4 py-2">
+                                        <EditButton :href="`users/${user.id}/edit`"
+                                            class="ml-2 py-3 rounded my-auto text-white bg-red-500" />
                                         <DangerButton class="ml-2 py-3 rounded my-auto text-white bg-red-500" @click="
                                             deleteUser(
                                                 user.id
